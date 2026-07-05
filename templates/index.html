@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 {{ title }}</h1>
+            <p class="subtitle">Deployed on AWS EC2 with GitHub Actions CI/CD</p>
+        </header>
+
+        <section class="content">
+            <div class="card">
+                <h2>📋 {{ message }}</h2>
+                <p>Your Flask application is successfully running on an EC2 instance!</p>
+            </div>
+
+            <div class="card">
+                <h3>📊 System Information</h3>
+                <ul>
+                    <li><strong>Server:</strong> Ubuntu 22.04 LTS</li>
+                    <li><strong>Python Version:</strong> {{ python_version }}</li>
+                    <li><strong>Current Time:</strong> {{ current_time }}</li>
+                    <li><strong>Status:</strong> <span class="status">✅ Running</span></li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>🚀 Deployment Status</h3>
+                <div class="status-indicator">
+                    <div class="dot green"></div>
+                    <span>Auto-deployment active via GitHub Actions</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="dot blue"></div>
+                    <span>S3 integration ready for static assets</span>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Made with ❤️ using Flask • AWS EC2 • GitHub Actions</p>
+            <div class="links">
+                <a href="/about">About</a> |
+                <a href="/health">Health Check</a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
