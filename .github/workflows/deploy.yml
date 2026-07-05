@@ -1,0 +1,60 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔑 Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: 🚀 Deploy to EC2
+      run: |
+        ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+          echo "========================================"
+          echo "🚀 Starting deployment..."
+          echo "========================================"
+          
+          # Navigate to project
+          cd ~/flask-app
+          
+          echo "📥 Pulling latest code from GitHub..."
+          git pull origin main
+          
+          echo "🐍 Activating virtual environment..."
+          source venv/bin/activate
+          
+          echo "📦 Installing dependencies..."
+          pip install -r requirements.txt
+          
+          echo "🛑 Stopping existing application..."
+          pkill -f "python app.py" || true
+          
+          echo "🚀 Starting application..."
+          nohup python app.py > app.log 2>&1 &
+          
+          echo "========================================"
+          echo "✅ Deployment complete!"
+          echo "🌐 App running at: http://${{ secrets.EC2_HOST }}:5000"
+          echo "========================================"
+        EOF
+
+    - name: ✅ Verify Deployment
+      run: |
+        echo "⏳ Waiting for app to start..."
+        sleep 10
+        curl -f http://${{ secrets.EC2_HOST }}:5000 || exit 1
+        echo "✅ Application is running successfully!"
+
